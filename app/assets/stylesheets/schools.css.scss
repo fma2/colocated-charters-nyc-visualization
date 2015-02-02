@@ -5,12 +5,29 @@
 
 body { margin:0; padding:0; }
 #map { position:absolute; top:0; bottom:0; width:100%; }
-
+.header {
+	position: relative;
+	top:0px;
+}
+.title { 
+	position: relative; 
+	z-index:1; 
+	color:	#4C4C4C;
+	top:0px;
+	padding-top:0;
+	padding-bottom:0;
+	font-size:3em;
+	letter-spacing:2px;
+	line-height:50px;
+	text-transform:uppercase;
+	font-family:'Brandon', sans-serif;
+}
 .ui-brush {
 	background:#f8f8f8;
 	position:absolute;
 	bottom:0;right:0;left:0;
 	height:100px;
+	z-index: 1;
 }
 .brush .extent {
 	stroke:#fff;
@@ -20,4 +37,45 @@ body { margin:0; padding:0; }
 
 .popup {
 	color: black;
+}
+
+.axis {
+  font: 10px sans-serif;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+.axis .domain {
+  fill: none;
+  stroke: #000;
+  stroke-opacity: .3;
+  stroke-width: 10px;
+  stroke-linecap: round;
+}
+
+.axis .halo {
+  fill: none;
+  stroke: #ddd;
+  stroke-width: 8px;
+  stroke-linecap: round;
+}
+
+.slider .handle {
+  fill: #fff;
+  stroke: #000;
+  stroke-opacity: .5;
+  stroke-width: 1.25px;
+  cursor: crosshair;
+}
+
+/*MEDIA QUERIES*/
+
+/* Smartphones (portrait and landscape) ----------- */
+@media only screen 
+and (min-device-width : 320px) 
+and (max-device-width : 480px) {
+	.title {
+		font-size: 1em;	
+	}
 }
