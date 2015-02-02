@@ -15,4 +15,4 @@
 /log/*.log
 /tmp
 
-/config/api-keys.yml
+/config/api_keys.yml
