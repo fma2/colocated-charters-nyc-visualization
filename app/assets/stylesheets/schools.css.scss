@@ -1,0 +1,23 @@
+// Place all the styles related to the Schools controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+
+body { margin:0; padding:0; }
+#map { position:absolute; top:0; bottom:0; width:100%; }
+
+.ui-brush {
+	background:#f8f8f8;
+	position:absolute;
+	bottom:0;right:0;left:0;
+	height:100px;
+}
+.brush .extent {
+	stroke:#fff;
+	fill-opacity:0.125;
+	shape-rendering:crispEdges;
+}
+
+.popup {
+	color: black;
+}
