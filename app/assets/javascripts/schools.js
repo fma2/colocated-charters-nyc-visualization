@@ -2,8 +2,12 @@
 L.mapbox.accessToken = 'pk.eyJ1IjoiZm1hMiIsImEiOiJkcmdtd0NjIn0.dw0I__cIjfXpz37Yj0DQmw';
 var map = L.mapbox.map('map', 'fma2.l3g81h30', {
     attributionControl: false,
-    infoControl: true
+    infoControl: true, 
+    zoomControl:false
 })
+
+var zoomControl = new L.Control.Zoom({position: 'topright' })
+zoomControl.addTo(map);
 
 // Info control 
 map.infoControl.addInfo (
@@ -38,7 +42,7 @@ var schoolsLayer = L.geoJson(null, { pointToLayer: scaledPoint })
     .addTo(map);
 
 function pointColor(feature) {
-    return feature.properties.managed_by_name == "Charter" ? '#f55' : '#a00';
+    return feature.properties.managed_by_name == "Charter" ? '#f55' : '#0000FF';
     // return feature.properties.mag > 5 ? '#f55' : '#a00';
 }
 function pointRadius(feature) {
@@ -67,19 +71,86 @@ function setBrush(data) {
     width = container.node().offsetWidth,
     margin = {top: 0, right: 0, bottom: 0, left: 0},
     height = 100;
+
     var timeExtent = d3.extent(data, function(d) {
         return new Date(d.properties.opening_date);
     });
+
     var svg = container.append('svg')
     .attr('width', width + margin.left + margin.right)
-    .attr('height', height + margin.top + margin.bottom);
+    .attr('height', height + margin.top + margin.bottom)
 
     var context = svg.append('g')
     .attr('class', 'context')
     .attr('transform', 'translate(' +
         margin.left + ',' +
         margin.top + ')');
+    
+    // var x = d3.scale.linear()
+    // .domain(timeExtent)
+    // .range([0, width])
+    // .clamp(true);
+    // var x = d3.scale.linear()
+    // .domain([0, 180])
+    // .range([0, width])
+    // .clamp(true);
 
+    // var brush = d3.svg.brush()
+    // .x(x)
+    // .extent([0, 0])
+    // .on("brush", brushed);
+
+    // var brush = d3.svg.brush()
+    // .x(x)
+    // .extent([0, 0])
+    // .on('brushend', brushend);
+
+    // var context = svg.append("g")
+    // .attr("class", "x axis")
+    // .attr("transform", "translate(0," + height / 2 + ")")
+    // .call(d3.svg.axis()
+    // .scale(x)
+    // .orient("bottom")
+    // .tickFormat(function(d) { return d + "°"; })
+    // .tickSize(0)
+    // .tickPadding(12))
+    // .select(".domain")
+    // .select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
+    // .attr("class", "halo");
+
+    // var slider = svg.append("g")
+    // .attr("class", "slider")
+    // .call(brush); 
+
+    // slider.selectAll(".extent, .resize")
+    // .remove();
+
+    // slider.select(".background")
+    // .attr("height", height);
+
+    // var handle = slider.append("circle")
+    // .attr("class", "handle")
+    // .attr("transform", "translate(0," + height / 2 + ")")
+    // .attr("r", 9);
+
+    // slider
+    // .call(brush.event)
+    // .transition() // gratuitous intro!
+    // .duration(750)
+    // .call(brush.extent([70, 70]))
+    // .call(brush.event);
+
+    // function brushed() {
+    //   var value = brush.extent()[0];
+
+    //   if (d3.event.sourceEvent) { // not a programmatic event
+    //     value = x.invert(d3.mouse(this)[0]);
+    //     brush.extent([value, value]);
+    //   }
+
+    //   handle.attr("cx", x(value));
+    //   d3.select("body").style("background-color", d3.hsl(value, .8, .8));
+    // }
     var x = d3.time.scale()
     .range([0, width])
     .domain(timeExtent);
@@ -88,7 +159,7 @@ function setBrush(data) {
     .x(x)
     .on('brushend', brushend);
 
-    context.selectAll('circle.quake')
+    context.selectAll('circle')
     .data(data)
     .enter()
     .append('circle')
@@ -124,4 +195,5 @@ function setBrush(data) {
         schoolsLayer.clearLayers()
         .addData(filtered);
     }
+
 }
