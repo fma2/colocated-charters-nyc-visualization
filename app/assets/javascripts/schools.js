@@ -18,12 +18,12 @@ $.ajax({
   url: '/',
   type: 'GET'
 }).success(function(data){
-  loadAllSchools(data);
+  // loadAllSchools(data);
 });
 
 //Function that places all schools on map
 function loadAllSchools(data) {
-  // featureLayer = L.mapbox.featureLayer(data).addTo(map)
+  // featureLayer = L.mapbox.featureLayer(data, {pointToLayer:scaledPoint}).addTo(map)
   featureLayer = L.mapbox.featureLayer(data)
   clusterGroup = createClusterGroup(featureLayer)
   map.addLayer(clusterGroup);  
@@ -57,6 +57,13 @@ function scaledPoint(feature, latlng) {
         fillOpacity: 0.7,
         weight: 0.5,
         color: '#fff'
+    // return L.marker(latlng, {
+    //         icon: L.divIcon({
+    //         className: 'label',
+    //         html: feature.properties.managed_by_name,
+    //         iconSize: [100, 40]
+    //         })
+    //     });
     }).bindPopup('<h2 class="popup school-name">' + feature.properties.location_name + '</h2>' + '<h3 class="popup opening-date">' + new Date(feature.properties.opening_date).toDateString() + '</h3>' + '<p class="popup mgmt-info">' + feature.properties.managed_by_name + '</p>');
 }
 
@@ -84,12 +91,59 @@ function setBrush(data) {
     .attr('class', 'context')
     .attr('transform', 'translate(' +
         margin.left + ',' +
-        margin.top + ')');
+        margin.top + ')')
+
+    var x = d3.time.scale()
+    .range([0, width])
+    .domain(timeExtent)
+
+    var brush = d3.svg.brush()
+    .x(x)
+    .on('brushend', brushend);
+
+    context.selectAll('circle')
+    .data(data)
+    .enter()
+    .append('circle')
+    .attr('transform', function(d) {
+        return 'translate(' + [x(new Date(d.properties.opening_date)), height / 2] + ')';
+    })
+    .attr('r', pointRadius)
+    .attr('opacity', 0.5)
+    .attr('stroke', '#fff')
+    .attr('stroke-width', 0.5)
+    .attr('fill', pointColor);
+
+    context.append('g')
+    .attr('class', 'x brush')
+    .call(brush)
+    .selectAll('rect')
+    .attr('y', -6)
+    .attr('height', height);
+
+    function brushend() {
+        var filter;
+            // If the user has selected no brush area, share everything.
+        if (brush.empty()) {
+            filter = function() { return true; }
+        } else {
+        // Otherwise, restrict features to only things in the brush extent.
+        filter = function(feature) {
+            return new Date(feature.properties.opening_date) > brush.extent()[0] &&
+            new Date(feature.properties.opening_date) < (brush.extent()[1]);
+            };
+        }
+        var filtered = data.filter(filter);
+        schoolsLayer.clearLayers()
+        .addData(filtered);
+    }
+
     
     // var x = d3.scale.linear()
-    // .domain(timeExtent)
+    // .domain([timeExtent[0].getFullYear(), timeExtent[1].getFullYear()])
     // .range([0, width])
     // .clamp(true);
+    // console.log(timeExtent[0].getFullYear())
     // var x = d3.scale.linear()
     // .domain([0, 180])
     // .range([0, width])
@@ -151,49 +205,5 @@ function setBrush(data) {
     //   handle.attr("cx", x(value));
     //   d3.select("body").style("background-color", d3.hsl(value, .8, .8));
     // }
-    var x = d3.time.scale()
-    .range([0, width])
-    .domain(timeExtent);
-
-    var brush = d3.svg.brush()
-    .x(x)
-    .on('brushend', brushend);
-
-    context.selectAll('circle')
-    .data(data)
-    .enter()
-    .append('circle')
-    .attr('transform', function(d) {
-        return 'translate(' + [x(new Date(d.properties.opening_date)), height / 2] + ')';
-    })
-    .attr('r', pointRadius)
-    .attr('opacity', 0.5)
-    .attr('stroke', '#fff')
-    .attr('stroke-width', 0.5)
-    .attr('fill', pointColor);
-
-    context.append('g')
-    .attr('class', 'x brush')
-    .call(brush)
-    .selectAll('rect')
-    .attr('y', -6)
-    .attr('height', height);
-
-    function brushend() {
-        var filter;
-            // If the user has selected no brush area, share everything.
-        if (brush.empty()) {
-            filter = function() { return true; }
-        } else {
-        // Otherwise, restrict features to only things in the brush extent.
-        filter = function(feature) {
-            return new Date(feature.properties.opening_date) > brush.extent()[0] &&
-            new Date(feature.properties.opening_date) < (brush.extent()[1]);
-            };
-        }
-        var filtered = data.filter(filter);
-        schoolsLayer.clearLayers()
-        .addData(filtered);
-    }
-
+    
 }
